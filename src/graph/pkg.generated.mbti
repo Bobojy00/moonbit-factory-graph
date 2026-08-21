@@ -1,0 +1,139 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Bobojy00/moonbit_factory_graph/src/graph"
+
+import {
+  "Bobojy00/moonbit_factory_graph/src/types",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn validate_graph(FactoryGraph) -> Array[@types.ValidationIssue]
+
+// Errors
+
+// Types and methods
+pub struct Edge {
+  meta : @types.EdgeMetadata
+} derive(Eq, @debug.Debug)
+pub fn Edge::bandwidth(Self) -> Double
+pub fn Edge::create(String, String, String, @types.FlowType, bandwidth_units_per_hour? : Double, transport_delay_sec? : Double, distance_meters? : Double, energy_loss_kw? : Double, safety_level? : @types.SafetyLevel, protocol? : @types.ControlProtocol, medium? : @types.TransferMedium, energy_type? : @types.EnergyType, is_bidirectional? : Bool, is_active? : Bool, redundancy_priority? : Int, description? : String) -> Self
+pub fn Edge::description(Self) -> String
+pub fn Edge::distance_meters(Self) -> Double
+pub fn Edge::energy_loss_kw(Self) -> Double
+pub fn Edge::energy_type(Self) -> @types.EnergyType
+pub fn Edge::flow_type(Self) -> @types.FlowType
+pub fn Edge::id(Self) -> String
+pub fn Edge::is_active(Self) -> Bool
+pub fn Edge::is_bidirectional(Self) -> Bool
+pub fn Edge::medium(Self) -> @types.TransferMedium
+pub fn Edge::metadata(Self) -> @types.EdgeMetadata
+pub fn Edge::new(@types.EdgeMetadata) -> Self
+pub fn Edge::protocol(Self) -> @types.ControlProtocol
+pub fn Edge::redundancy_priority(Self) -> Int
+pub fn Edge::safety_level(Self) -> @types.SafetyLevel
+pub fn Edge::set_active(Self, Bool) -> Unit
+pub fn Edge::set_bandwidth(Self, Double) -> Unit
+pub fn Edge::source_id(Self) -> String
+pub fn Edge::target_id(Self) -> String
+pub fn Edge::to_string(Self) -> String
+pub fn Edge::transport_delay_sec(Self) -> Double
+pub impl Show for Edge
+
+pub struct FactoryGraph {
+  nodes : Map[String, Node]
+  edges : Map[String, Edge]
+  out_edges : Map[String, Array[Edge]]
+  in_edges : Map[String, Array[Edge]]
+  layer_out_edges : Map[String, Map[String, Array[Edge]]]
+  layer_in_edges : Map[String, Map[String, Array[Edge]]]
+  zones : Map[String, Array[String]]
+  safety_zones : Map[String, Array[String]]
+  mut config : @types.FactoryConfig
+} derive(@debug.Debug)
+pub fn FactoryGraph::add_edge(Self, Edge) -> Unit
+pub fn FactoryGraph::add_node(Self, Node) -> Unit
+pub fn FactoryGraph::calculate_active_nodes_count(Self) -> Int
+pub fn FactoryGraph::calculate_total_power_kw(Self) -> Double
+pub fn FactoryGraph::clone(Self) -> Self
+pub fn FactoryGraph::config(Self) -> @types.FactoryConfig
+pub fn FactoryGraph::edge_count(Self) -> Int
+pub fn FactoryGraph::get_all_edges(Self) -> Array[Edge]
+pub fn FactoryGraph::get_all_nodes(Self) -> Array[Node]
+pub fn FactoryGraph::get_all_safety_zones(Self) -> Array[String]
+pub fn FactoryGraph::get_all_zones(Self) -> Array[String]
+pub fn FactoryGraph::get_edge(Self, String) -> Edge?
+pub fn FactoryGraph::get_in_edges(Self, String) -> Array[Edge]
+pub fn FactoryGraph::get_in_neighbors(Self, String) -> Array[String]
+pub fn FactoryGraph::get_layer_in_edges(Self, @types.FlowType, String) -> Array[Edge]
+pub fn FactoryGraph::get_layer_in_neighbors(Self, @types.FlowType, String) -> Array[String]
+pub fn FactoryGraph::get_layer_out_edges(Self, @types.FlowType, String) -> Array[Edge]
+pub fn FactoryGraph::get_layer_out_neighbors(Self, @types.FlowType, String) -> Array[String]
+pub fn FactoryGraph::get_node(Self, String) -> Node?
+pub fn FactoryGraph::get_nodes_in_safety_zone(Self, String) -> Array[Node]
+pub fn FactoryGraph::get_nodes_in_zone(Self, String) -> Array[Node]
+pub fn FactoryGraph::get_out_edges(Self, String) -> Array[Edge]
+pub fn FactoryGraph::get_out_neighbors(Self, String) -> Array[String]
+pub fn FactoryGraph::has_edge(Self, String) -> Bool
+pub fn FactoryGraph::has_node(Self, String) -> Bool
+pub fn FactoryGraph::new(config? : @types.FactoryConfig) -> Self
+pub fn FactoryGraph::node_count(Self) -> Int
+pub fn FactoryGraph::set_config(Self, @types.FactoryConfig) -> Unit
+
+pub struct FactoryGraphBuilder {
+  graph : FactoryGraph
+  mut edge_counter : Int
+} derive(@debug.Debug)
+pub fn FactoryGraphBuilder::add_buffer(Self, String, String, zone? : String, subzone? : String, capacity? : Double, initial_wip? : Double, safety_zone_id? : String) -> Self
+pub fn FactoryGraphBuilder::add_conveyor(Self, String, String, zone? : String, subzone? : String, nominal_power_kw? : Double, capacity? : Double, safety_zone_id? : String) -> Self
+pub fn FactoryGraphBuilder::add_inspection(Self, String, String, zone? : String, subzone? : String, cycle_time_sec? : Double, nominal_power_kw? : Double, safety_zone_id? : String) -> Self
+pub fn FactoryGraphBuilder::add_machine(Self, String, String, zone? : String, subzone? : String, cycle_time_sec? : Double, nominal_power_kw? : Double, mtbf_hours? : Double, mttr_hours? : Double, safety_zone_id? : String) -> Self
+pub fn FactoryGraphBuilder::add_plc(Self, String, String, zone? : String, subzone? : String, safety_zone_id? : String) -> Self
+pub fn FactoryGraphBuilder::add_power_source(Self, String, String, zone? : String, subzone? : String, capacity_kw? : Double, safety_zone_id? : String) -> Self
+pub fn FactoryGraphBuilder::add_robot(Self, String, String, zone? : String, subzone? : String, cycle_time_sec? : Double, nominal_power_kw? : Double, safety_zone_id? : String) -> Self
+pub fn FactoryGraphBuilder::add_safety_gate(Self, String, String, zone? : String, subzone? : String, safety_zone_id? : String) -> Self
+pub fn FactoryGraphBuilder::add_sensor(Self, String, String, zone? : String, subzone? : String, nominal_power_kw? : Double, safety_zone_id? : String) -> Self
+pub fn FactoryGraphBuilder::add_workstation(Self, String, String, zone? : String, subzone? : String, cycle_time_sec? : Double, nominal_power_kw? : Double, mtbf_hours? : Double, mttr_hours? : Double, safety_zone_id? : String) -> Self
+pub fn FactoryGraphBuilder::build(Self) -> FactoryGraph
+pub fn FactoryGraphBuilder::connect_control(Self, String, String, protocol? : @types.ControlProtocol, latency_ms? : Double) -> Self
+pub fn FactoryGraphBuilder::connect_energy(Self, String, String, energy_type? : @types.EnergyType, loss_kw? : Double) -> Self
+pub fn FactoryGraphBuilder::connect_line(Self, Array[String], bandwidth? : Double, delay? : Double) -> Self
+pub fn FactoryGraphBuilder::connect_material(Self, String, String, bandwidth? : Double, delay? : Double, distance? : Double, medium? : @types.TransferMedium, redundancy_priority? : Int) -> Self
+pub fn FactoryGraphBuilder::connect_plc_network(Self, String, Array[String], protocol? : @types.ControlProtocol) -> Self
+pub fn FactoryGraphBuilder::connect_power_bus(Self, String, Array[String], energy_type? : @types.EnergyType) -> Self
+pub fn FactoryGraphBuilder::connect_safety(Self, String, String, level? : @types.SafetyLevel) -> Self
+pub fn FactoryGraphBuilder::connect_safety_domain(Self, String, Array[String], level? : @types.SafetyLevel) -> Self
+pub fn FactoryGraphBuilder::connect_telemetry(Self, String, String, protocol? : @types.ControlProtocol) -> Self
+pub fn FactoryGraphBuilder::new(plant_name? : String, location? : String, takt_time_target_sec? : Double) -> Self
+
+pub struct Node {
+  meta : @types.NodeMetadata
+} derive(Eq, @debug.Debug)
+pub fn Node::availability(Self) -> Double
+pub fn Node::capacity(Self) -> Double
+pub fn Node::create(String, String, @types.NodeType, zone? : String, subzone? : String, cycle_time_sec? : Double, nominal_power_kw? : Double, mtbf_hours? : Double, mttr_hours? : Double, capacity? : Double, initial_wip? : Double, max_wip? : Double, is_bottleneck_candidate? : Bool, status? : @types.OperatingStatus, safety_zone_id? : String, description? : String) -> Self
+pub fn Node::cycle_time_sec(Self) -> Double
+pub fn Node::description(Self) -> String
+pub fn Node::hourly_throughput_limit(Self) -> Double
+pub fn Node::id(Self) -> String
+pub fn Node::initial_wip(Self) -> Double
+pub fn Node::is_bottleneck_candidate(Self) -> Bool
+pub fn Node::is_operational(Self) -> Bool
+pub fn Node::max_wip(Self) -> Double
+pub fn Node::metadata(Self) -> @types.NodeMetadata
+pub fn Node::mtbf_hours(Self) -> Double
+pub fn Node::mttr_hours(Self) -> Double
+pub fn Node::name(Self) -> String
+pub fn Node::new(@types.NodeMetadata) -> Self
+pub fn Node::node_type(Self) -> @types.NodeType
+pub fn Node::nominal_power_kw(Self) -> Double
+pub fn Node::safety_zone_id(Self) -> String
+pub fn Node::set_status(Self, @types.OperatingStatus) -> Unit
+pub fn Node::status(Self) -> @types.OperatingStatus
+pub fn Node::subzone(Self) -> String
+pub fn Node::to_string(Self) -> String
+pub fn Node::zone(Self) -> String
+pub impl Show for Node
+
+// Type aliases
+
+// Traits
