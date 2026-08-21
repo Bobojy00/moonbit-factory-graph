@@ -1,0 +1,47 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Bobojy00/moonbit_factory_graph"
+
+import {
+  "Bobojy00/moonbit_factory_graph/src/algorithms",
+  "Bobojy00/moonbit_factory_graph/src/analysis",
+  "Bobojy00/moonbit_factory_graph/src/diff",
+  "Bobojy00/moonbit_factory_graph/src/graph",
+  "Bobojy00/moonbit_factory_graph/src/optimizer",
+}
+
+// Values
+pub fn analyze_bottlenecks(@graph.FactoryGraph) -> @analysis.BottleneckAnalysisReport
+
+pub fn diff_topologies(@graph.FactoryGraph, @graph.FactoryGraph) -> @diff.TopologyDiffReport
+
+pub fn export_dot(@graph.FactoryGraph) -> String
+
+pub fn export_json_spec(@graph.FactoryGraph) -> String
+
+pub fn export_mermaid_diagram(@graph.FactoryGraph) -> String
+
+pub fn find_shortest_material_path(@graph.FactoryGraph, String, String) -> @algorithms.PathResult?
+
+pub fn generate_audit_report(@graph.FactoryGraph) -> String
+
+pub fn load_automotive_plant() -> @graph.FactoryGraph
+
+pub fn load_battery_plant() -> @graph.FactoryGraph
+
+pub fn load_chemical_plant() -> @graph.FactoryGraph
+
+pub fn load_semiconductor_plant() -> @graph.FactoryGraph
+
+pub fn new_builder(plant_name? : String, location? : String, takt_time_target_sec? : Double) -> @graph.FactoryGraphBuilder
+
+pub fn optimize_line(@graph.FactoryGraph) -> @optimizer.LineBalancePlan
+
+pub fn simulate_plant_outage(@graph.FactoryGraph, String) -> @analysis.OutageSimulationResult
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
