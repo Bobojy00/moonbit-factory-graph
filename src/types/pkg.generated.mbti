@@ -1,0 +1,236 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Bobojy00/moonbit_factory_graph/src/types"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn format_double(Double, Int) -> String
+
+pub fn json_escape_string(String) -> String
+
+// Errors
+
+// Types and methods
+pub(all) enum AlarmSeverity {
+  Notice
+  Minor
+  Major
+  Emergency
+} derive(Compare, Eq, @debug.Debug)
+pub fn AlarmSeverity::to_string(Self) -> String
+pub impl Show for AlarmSeverity
+
+pub(all) enum ControlProtocol {
+  OPC_UA
+  Modbus_TCP
+  Modbus_RTU
+  Profinet
+  EtherNet_IP
+  EtherCAT
+  MQTT
+  CANopen
+  IO_Link
+  DiscreteWiring
+} derive(Compare, Eq, @debug.Debug)
+pub fn ControlProtocol::to_string(Self) -> String
+pub impl Show for ControlProtocol
+
+pub(all) struct EdgeMetadata {
+  id : String
+  source_id : String
+  target_id : String
+  flow_type : FlowType
+  mut bandwidth_units_per_hour : Double
+  transport_delay_sec : Double
+  distance_meters : Double
+  energy_loss_kw : Double
+  safety_level : SafetyLevel
+  protocol : ControlProtocol
+  medium : TransferMedium
+  energy_type : EnergyType
+  is_bidirectional : Bool
+  mut is_active : Bool
+  redundancy_priority : Int
+  description : String
+} derive(Eq, @debug.Debug)
+pub fn EdgeMetadata::new(String, String, String, FlowType, bandwidth_units_per_hour? : Double, transport_delay_sec? : Double, distance_meters? : Double, energy_loss_kw? : Double, safety_level? : SafetyLevel, protocol? : ControlProtocol, medium? : TransferMedium, energy_type? : EnergyType, is_bidirectional? : Bool, is_active? : Bool, redundancy_priority? : Int, description? : String) -> Self
+
+pub(all) enum EnergyType {
+  AC_380V_3Phase
+  AC_220V_SinglePhase
+  DC_24V
+  DC_48V
+  Pneumatic_6Bar
+  Hydraulic_160Bar
+  CoolingWater
+  NitrogenGas
+} derive(Compare, Eq, @debug.Debug)
+pub fn EnergyType::to_string(Self) -> String
+pub impl Show for EnergyType
+
+pub(all) struct FactoryConfig {
+  plant_name : String
+  site_location : String
+  version : String
+  takt_time_target_sec : Double
+  planned_shifts_per_day : Int
+  shift_duration_hours : Double
+  target_oee : Double
+  default_currency : String
+} derive(Eq, @debug.Debug)
+pub fn FactoryConfig::default() -> Self
+
+pub(all) enum FlowType {
+  MaterialFlow
+  ControlFlow
+  EnergyFlow
+  SafetyInterlock
+  PneumaticFlow
+  CoolantFlow
+  DataTelemetry
+} derive(Compare, Eq, @debug.Debug)
+pub fn FlowType::from_string(String) -> Self
+pub fn FlowType::to_string(Self) -> String
+pub impl Show for FlowType
+
+pub(all) struct NodeMetadata {
+  id : String
+  name : String
+  zone : String
+  subzone : String
+  node_type : NodeType
+  cycle_time_sec : Double
+  nominal_power_kw : Double
+  mtbf_hours : Double
+  mttr_hours : Double
+  capacity : Double
+  initial_wip : Double
+  max_wip : Double
+  is_bottleneck_candidate : Bool
+  mut status : OperatingStatus
+  safety_zone_id : String
+  description : String
+} derive(Eq, @debug.Debug)
+pub fn NodeMetadata::availability(Self) -> Double
+pub fn NodeMetadata::hourly_throughput_limit(Self) -> Double
+pub fn NodeMetadata::new(String, String, NodeType, zone? : String, subzone? : String, cycle_time_sec? : Double, nominal_power_kw? : Double, mtbf_hours? : Double, mttr_hours? : Double, capacity? : Double, initial_wip? : Double, max_wip? : Double, is_bottleneck_candidate? : Bool, status? : OperatingStatus, safety_zone_id? : String, description? : String) -> Self
+
+pub(all) enum NodeType {
+  Workstation
+  Machine
+  Conveyor
+  Buffer
+  Sensor
+  PowerSource
+  SafetyGate
+  AGVTrack
+  Diverter
+  Inspection
+  StorageRack
+  RobotArm
+  PneumaticPump
+  Chiller
+  PLCController
+} derive(Compare, Eq, @debug.Debug)
+pub fn NodeType::from_string(String) -> Self
+pub fn NodeType::to_string(Self) -> String
+pub impl Show for NodeType
+
+pub(all) enum OperatingStatus {
+  Online
+  Degraded
+  Offline
+  Maintenance
+  EmergencyStop
+  Standby
+  Calibrating
+} derive(Compare, Eq, @debug.Debug)
+pub fn OperatingStatus::from_string(String) -> Self
+pub fn OperatingStatus::is_operational(Self) -> Bool
+pub fn OperatingStatus::to_string(Self) -> String
+pub impl Show for OperatingStatus
+
+pub(all) struct PlantAlarm {
+  alarm_id : String
+  source_node_id : String
+  severity : AlarmSeverity
+  timestamp_sec : Int
+  message : String
+  is_acknowledged : Bool
+  tripped_nodes : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn PlantAlarm::new(String, String, AlarmSeverity, Int, String, is_acknowledged? : Bool, tripped_nodes? : Array[String]) -> Self
+
+pub(all) struct PlantZone {
+  id : String
+  name : String
+  workshop : String
+  description : String
+  max_operators : Int
+  safety_zone_id : String
+  is_cleanroom : Bool
+} derive(Eq, @debug.Debug)
+pub fn PlantZone::new(String, String, workshop? : String, description? : String, max_operators? : Int, safety_zone_id? : String, is_cleanroom? : Bool) -> Self
+
+pub(all) enum SafetyLevel {
+  SIL1
+  SIL2
+  SIL3
+  SIL4
+  PL_a
+  PL_b
+  PL_c
+  PL_d
+  PL_e
+  Standard
+} derive(Compare, Eq, @debug.Debug)
+pub fn SafetyLevel::to_string(Self) -> String
+pub impl Show for SafetyLevel
+
+pub(all) struct TelemetryPoint {
+  timestamp_sec : Int
+  node_id : String
+  metric_name : String
+  value : Double
+  unit : String
+  is_normal : Bool
+} derive(Eq, @debug.Debug)
+pub fn TelemetryPoint::new(Int, String, String, Double, String, is_normal? : Bool) -> Self
+
+pub(all) enum TransferMedium {
+  BeltConveyor
+  RollerConveyor
+  OverheadMonorail
+  AGV
+  RoboticPickAndPlace
+  PneumaticTube
+  GravityChute
+  ManualTransfer
+  Pipe
+} derive(Compare, Eq, @debug.Debug)
+pub fn TransferMedium::to_string(Self) -> String
+pub impl Show for TransferMedium
+
+pub(all) struct ValidationIssue {
+  rule_id : String
+  severity : ValidationSeverity
+  target_id : String
+  message : String
+  suggested_fix : String
+} derive(Eq, @debug.Debug)
+pub fn ValidationIssue::new(String, ValidationSeverity, String, String, suggested_fix? : String) -> Self
+
+pub(all) enum ValidationSeverity {
+  Info
+  Warning
+  Error
+  Critical
+} derive(Compare, Eq, @debug.Debug)
+pub fn ValidationSeverity::to_string(Self) -> String
+pub impl Show for ValidationSeverity
+
+// Type aliases
+
+// Traits
