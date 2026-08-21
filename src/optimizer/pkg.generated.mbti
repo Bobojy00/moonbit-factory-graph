@@ -1,0 +1,68 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Bobojy00/moonbit_factory_graph/src/optimizer"
+
+import {
+  "Bobojy00/moonbit_factory_graph/src/graph",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn optimize_buffer_capacities(@graph.FactoryGraph) -> Array[BufferTuningRecommendation]
+
+pub fn optimize_line_balance(@graph.FactoryGraph) -> LineBalancePlan
+
+pub fn plan_staggered_energy_startup(@graph.FactoryGraph) -> EnergySchedulePlan
+
+pub fn synthesize_failover_routing(@graph.FactoryGraph, String, String, String) -> FailoverRoutePlan
+
+// Errors
+
+// Types and methods
+pub(all) struct BufferTuningRecommendation {
+  buffer_id : String
+  upstream_station_id : String
+  downstream_station_id : String
+  current_capacity : Double
+  recommended_capacity : Double
+  rationale : String
+} derive(Eq, @debug.Debug)
+
+pub(all) struct EnergySchedulePlan {
+  startup_sequence : Array[StartupSequenceStep]
+  total_installed_power_kw : Double
+  peak_shaved_startup_power_kw : Double
+} derive(Eq, @debug.Debug)
+
+pub(all) struct FailoverRoutePlan {
+  failed_node_id : String
+  alternate_route_found : Bool
+  suggested_bypass_path : Array[String]
+  derated_capacity_units_per_hour : Double
+  action_summary : String
+} derive(Eq, @debug.Debug)
+
+pub(all) struct LineBalancePlan {
+  recommendations : Array[RebalanceRecommendation]
+  current_smoothness_index : Double
+  projected_smoothness_index : Double
+  projected_throughput_increase_percent : Double
+} derive(Eq, @debug.Debug)
+
+pub(all) struct RebalanceRecommendation {
+  station_id : String
+  current_cycle_time : Double
+  target_takt_time : Double
+  suggested_action : String
+  suggested_parallel_count : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) struct StartupSequenceStep {
+  step_index : Int
+  machine_ids : Array[String]
+  step_power_kw : Double
+  delay_after_sec : Double
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits
