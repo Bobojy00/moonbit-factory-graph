@@ -1,0 +1,84 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Bobojy00/moonbit_factory_graph/src/algorithms"
+
+import {
+  "Bobojy00/moonbit_factory_graph/src/graph",
+  "Bobojy00/moonbit_factory_graph/src/types",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn compute_asset_centrality(@graph.FactoryGraph) -> Array[NodeCentralityRanking]
+
+pub fn detect_material_cycles(@graph.FactoryGraph) -> Array[DetectedCycle]
+
+pub fn dijkstra_shortest_path(@graph.FactoryGraph, String, String, flow_type? : @types.FlowType, criteria? : CostCriteria) -> PathResult?
+
+pub fn edmonds_karp_max_flow(@graph.FactoryGraph, String, String) -> MaxFlowResult
+
+pub fn find_critical_spof_assets(@graph.FactoryGraph) -> CriticalAssetReport
+
+pub fn find_disjoint_paths(@graph.FactoryGraph, String, String, flow_type? : @types.FlowType, node_disjoint? : Bool) -> Array[PathResult]
+
+pub fn k_shortest_paths(@graph.FactoryGraph, String, String, Int, flow_type? : @types.FlowType, criteria? : CostCriteria) -> Array[PathResult]
+
+pub fn strongly_connected_components(@graph.FactoryGraph, flow_type? : @types.FlowType) -> Array[Array[String]]
+
+pub fn topological_production_schedule(@graph.FactoryGraph) -> ScheduleCriticalPath?
+
+// Errors
+
+// Types and methods
+pub(all) enum CostCriteria {
+  MinimumTransportDelay
+  MinimumCycleTime
+  MinimumEnergyLoss
+  BalancedManufacturingCost
+} derive(Eq, @debug.Debug)
+
+pub(all) struct CriticalAssetReport {
+  single_points_of_failure : Array[String]
+  critical_bridges : Array[String]
+} derive(@debug.Debug)
+
+pub(all) enum CycleClassification {
+  ValidPalletRecirculationLoop
+  DeadlockingMaterialDependency
+} derive(Eq, @debug.Debug)
+
+pub(all) struct DetectedCycle {
+  nodes : Array[String]
+  classification : CycleClassification
+  description : String
+} derive(@debug.Debug)
+
+pub(all) struct MaxFlowResult {
+  max_throughput_units_per_hour : Double
+  bottleneck_min_cut_edges : Array[String]
+} derive(@debug.Debug)
+
+pub(all) struct NodeCentralityRanking {
+  node_id : String
+  degree_centrality : Int
+  betweenness_score : Double
+  closeness_score : Double
+} derive(@debug.Debug)
+
+pub(all) struct PathResult {
+  nodes : Array[String]
+  edges : Array[@graph.Edge]
+  total_cost : Double
+  total_delay_sec : Double
+  bottleneck_bandwidth : Double
+} derive(Eq, @debug.Debug)
+
+pub(all) struct ScheduleCriticalPath {
+  ordered_stations : Array[String]
+  makespan_sec : Double
+  earliest_finish_times : Map[String, Double]
+  critical_path : Array[String]
+} derive(@debug.Debug)
+
+// Type aliases
+
+// Traits
