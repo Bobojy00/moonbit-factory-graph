@@ -1,0 +1,79 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Bobojy00/moonbit_factory_graph/src/diff"
+
+import {
+  "Bobojy00/moonbit_factory_graph/src/graph",
+  "Bobojy00/moonbit_factory_graph/src/types",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn compare_factory_topologies(@graph.FactoryGraph, @graph.FactoryGraph) -> TopologyDiffReport
+
+// Errors
+
+// Types and methods
+pub(all) struct EdgeDiffEntry {
+  edge_id : String
+  source_id : String
+  target_id : String
+  flow_type : @types.FlowType
+  diff_type : EdgeDiffType
+  old_bandwidth : Double
+  new_bandwidth : Double
+} derive(Eq, @debug.Debug)
+
+pub(all) enum EdgeDiffType {
+  EdgeAdded
+  EdgeRemoved
+  EdgeModified
+} derive(Eq, @debug.Debug)
+pub fn EdgeDiffType::to_string(Self) -> String
+pub impl Show for EdgeDiffType
+
+pub(all) enum MigrationRiskLevel {
+  LowRisk
+  MediumRisk
+  HighRisk
+  CriticalRisk
+} derive(Eq, @debug.Debug)
+pub fn MigrationRiskLevel::to_string(Self) -> String
+pub impl Show for MigrationRiskLevel
+
+pub(all) struct NodeDiffEntry {
+  node_id : String
+  diff_type : NodeDiffType
+  property_changes : Array[NodePropertyDiff]
+} derive(Eq, @debug.Debug)
+
+pub(all) enum NodeDiffType {
+  NodeAdded
+  NodeRemoved
+  NodeModified
+} derive(Eq, @debug.Debug)
+pub fn NodeDiffType::to_string(Self) -> String
+pub impl Show for NodeDiffType
+
+pub(all) struct NodePropertyDiff {
+  field_name : String
+  old_value : String
+  new_value : String
+  is_breaking : Bool
+} derive(Eq, @debug.Debug)
+
+pub(all) struct TopologyDiffReport {
+  added_nodes : Array[String]
+  removed_nodes : Array[String]
+  modified_nodes : Array[NodeDiffEntry]
+  added_edges : Array[String]
+  removed_edges : Array[String]
+  modified_edges : Array[EdgeDiffEntry]
+  overall_risk_level : MigrationRiskLevel
+  risk_score : Double
+  breaking_changes : Array[String]
+  mitigation_recommendations : Array[String]
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits
