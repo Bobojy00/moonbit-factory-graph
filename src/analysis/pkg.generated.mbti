@@ -1,0 +1,74 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Bobojy00/moonbit_factory_graph/src/analysis"
+
+import {
+  "Bobojy00/moonbit_factory_graph/src/graph",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn analyze_production_bottlenecks(@graph.FactoryGraph) -> BottleneckAnalysisReport
+
+pub fn audit_plant_safety_systems(@graph.FactoryGraph) -> SafetyAuditReport
+
+pub fn compute_plant_kpis(@graph.FactoryGraph) -> PlantHealthKPIs
+
+pub fn evaluate_line_redundancy(@graph.FactoryGraph, String, String) -> RedundancyReport
+
+pub fn simulate_device_outage(@graph.FactoryGraph, String, hourly_downtime_cost? : Double) -> OutageSimulationResult
+
+// Errors
+
+// Types and methods
+pub(all) struct BottleneckAnalysisReport {
+  takt_time_target_sec : Double
+  primary_bottleneck_node_id : String
+  primary_bottleneck_cycle_time : Double
+  secondary_bottlenecks : Array[String]
+  conveyor_bandwidth_bottlenecks : Array[String]
+  max_theoretical_hourly_output : Double
+  line_balance_efficiency_percent : Double
+} derive(Eq, @debug.Debug)
+
+pub(all) struct OutageSimulationResult {
+  failed_node_id : String
+  power_blackout_nodes : Array[String]
+  plc_timeout_nodes : Array[String]
+  safety_tripped_nodes : Array[String]
+  starved_workstations : Array[String]
+  blocked_workstations : Array[String]
+  all_impacted_nodes : Array[String]
+  production_capacity_loss_percent : Double
+  estimated_hourly_loss_cny : Double
+  affected_workstations_count : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) struct PlantHealthKPIs {
+  total_asset_count : Int
+  active_asset_count : Int
+  operational_availability_percent : Double
+  total_power_demand_kw : Double
+  target_takt_time_sec : Double
+  max_output_per_hour : Double
+  plant_health_score : Double
+} derive(Eq, @debug.Debug)
+
+pub(all) struct RedundancyReport {
+  overall_resilience_index : Double
+  fully_redundant_routes_count : Int
+  single_point_vulnerable_stations : Array[String]
+  bypass_path_available : Bool
+  resilience_grade : String
+} derive(Eq, @debug.Debug)
+
+pub(all) struct SafetyAuditReport {
+  total_safety_zones : Int
+  unprotected_machines : Array[String]
+  sil_compliant : Bool
+  estop_coverage_percent : Double
+  audit_status : String
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits
