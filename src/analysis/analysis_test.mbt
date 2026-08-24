@@ -63,4 +63,7 @@ test "safety_and_redundancy_evaluation" {
 
   let red = evaluate_line_redundancy(g, "A", "B")
   assert_eq(red.bypass_path_available, false)
+
+  let direct_paths = @algorithms.find_disjoint_paths(g, "A", "B")
+  assert_eq(direct_paths.length(), 1)
 }

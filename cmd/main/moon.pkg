@@ -1,4 +1,5 @@
 import {
+  "moonbitlang/core/bench",
   "moonbitlang/core/env",
   "Bobojy00/moonbit_factory_graph" @lib,
   "Bobojy00/moonbit_factory_graph/src/types",

@@ -28,6 +28,12 @@ pub fn find_disjoint_paths(
               e.set_active(false)
             }
           }
+          // A direct source-to-target path has no intermediate node to
+          // disable. Deactivate its edges as well so the next iteration
+          // cannot return the identical path forever.
+          for e in p.edges {
+            e.set_active(false)
+          }
         } else {
           // Only disable edges
           for e in p.edges {

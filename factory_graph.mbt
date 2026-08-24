@@ -88,3 +88,31 @@ pub fn diff_topologies(
 pub fn optimize_line(graph : @graph.FactoryGraph) -> @optimizer.LineBalancePlan {
   @optimizer.optimize_line_balance(graph)
 }
+
+///|
+pub fn inspect_graph_health(
+  graph : @graph.FactoryGraph,
+) -> @graph.GraphHealthReport {
+  @graph.inspect_graph_health(graph)
+}
+
+///|
+pub fn analyze_material_capacity(
+  graph : @graph.FactoryGraph,
+  demand_per_hour? : Double = 0.0,
+) -> @analysis.MaterialCapacityReport {
+  @analysis.analyze_material_capacity(graph, demand_per_hour~)
+}
+
+///|
+pub fn evaluate_outage_portfolio(
+  graph : @graph.FactoryGraph,
+  candidate_node_ids : Array[String],
+  hourly_downtime_cost? : Double = 50000.0,
+) -> @analysis.OutagePortfolioReport {
+  @analysis.evaluate_outage_portfolio(
+    graph,
+    candidate_node_ids,
+    hourly_downtime_cost~,
+  )
+}

@@ -7,6 +7,8 @@ import {
 }
 
 // Values
+pub fn inspect_graph_health(FactoryGraph) -> GraphHealthReport
+
 pub fn validate_graph(FactoryGraph) -> Array[@types.ValidationIssue]
 
 // Errors
@@ -104,6 +106,25 @@ pub fn FactoryGraphBuilder::connect_safety(Self, String, String, level? : @types
 pub fn FactoryGraphBuilder::connect_safety_domain(Self, String, Array[String], level? : @types.SafetyLevel) -> Self
 pub fn FactoryGraphBuilder::connect_telemetry(Self, String, String, protocol? : @types.ControlProtocol) -> Self
 pub fn FactoryGraphBuilder::new(plant_name? : String, location? : String, takt_time_target_sec? : Double) -> Self
+
+pub(all) struct FlowLayerHealth {
+  flow_type : @types.FlowType
+  active_edge_count : Int
+  inactive_edge_count : Int
+  total_bandwidth_units_per_hour : Double
+  max_bandwidth_units_per_hour : Double
+} derive(Eq, @debug.Debug)
+
+pub(all) struct GraphHealthReport {
+  total_node_count : Int
+  active_node_count : Int
+  inactive_node_count : Int
+  total_edge_count : Int
+  active_edge_count : Int
+  inactive_edge_count : Int
+  orphan_node_ids : Array[String]
+  layer_health : Array[FlowLayerHealth]
+} derive(Eq, @debug.Debug)
 
 pub struct Node {
   meta : @types.NodeMetadata

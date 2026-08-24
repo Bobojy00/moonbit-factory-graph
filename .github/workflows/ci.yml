@@ -5,9 +5,13 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  check-and-test:
+  check-test:
     name: Check & Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
@@ -19,45 +23,93 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup MoonBit Toolchain
-        uses: chawyehsu/setup-moonup@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
-
-      - name: Fallback Install MoonBit (Unix)
+      - name: Install MoonBit stable toolchain (Unix)
         if: runner.os != 'Windows'
+        shell: bash
         run: |
-          if ! command -v moon &> /dev/null; then
-            curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
-            echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - name: Install MoonBit stable toolchain (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          irm https://cli.moonbitlang.com/install/powershell.ps1 | iex
+          "$env:USERPROFILE\.moon\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Install native compiler dependencies (Windows)
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: mingw-w64-ucrt-x86_64-gcc
+
+      - name: Verify MoonBit version
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          moon version --all
+          MOONC_VERSION="$(moon version --all | sed -n 's/^moonc v\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/p')"
+          if [ -z "$MOONC_VERSION" ]; then
+            echo "Unable to determine moonc version"
+            exit 1
+          fi
+          IFS=. read -r major minor patch <<< "$MOONC_VERSION"
+          if [ "$major" -eq 0 ] && { [ "$minor" -lt 10 ] || { [ "$minor" -eq 10 ] && [ "$patch" -lt 9 ]; }; }; then
+            echo "moonc $MOONC_VERSION is older than the required stable version 0.10.9"
+            exit 1
           fi
 
-      - name: Fallback Install MoonBit (Windows)
+      - name: Verify MoonBit version (Windows)
         if: runner.os == 'Windows'
-        shell: powershell
+        shell: pwsh
         run: |
-          if (-not (Get-Command moon -ErrorAction SilentlyContinue)) {
-            irm https://cli.moonbitlang.com/install/powershell.ps1 | iex
-            "$env:USERPROFILE\.moon\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          moon version --all
+          $text = moon version --all | Out-String
+          $match = [regex]::Match($text, 'moonc v([0-9]+\.[0-9]+\.[0-9]+)')
+          if (-not $match.Success) { throw 'Unable to determine moonc version' }
+          $version = [version]$match.Groups[1].Value
+          if ($version -lt [version]'0.10.9') {
+            throw "moonc $version is older than the required stable version 0.10.9"
           }
 
-      - name: Verify MoonBit Version
-        run: moon version
+      - name: Set up Python for source-size check
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
 
-      - name: Check Strict Types & Deny Warnings
-        run: moon check --deny-warn
+      - name: Check production MoonBit source size
+        run: python scripts/check_moonbit_source.py --minimum 6000
 
-      - name: Check Code Formatting
+      - name: Check formatting
         run: moon fmt --check
 
-      - name: Check Public Interfaces (.mbti)
+      - name: Check strict types and warnings
+        run: moon check --deny-warn
+
+      - name: Build default and native targets
+        run: |
+          moon build
+          moon build --target native
+
+      - name: Verify generated public interfaces
+        shell: bash
         run: |
           moon info
           git diff --exit-code
 
-      - name: Run CLI Demo
-        run: moon run cmd/main -- demo
+      - name: Run default-target tests with coverage
+        run: |
+          moon test --deny-warn --enable-coverage
+          moon coverage report -f summary
 
-      - name: Run Performance Benchmark
+      - name: Run native tests with coverage
+        run: |
+          moon test --deny-warn --target native --enable-coverage
+          moon coverage report -f summary
+          moon coverage analyze
+
+      - name: Run CLI benchmark
+        if: runner.os == 'Linux'
         run: moon run cmd/main -- bench

@@ -7,6 +7,8 @@ import {
 }
 
 // Values
+pub fn analyze_material_capacity(@graph.FactoryGraph, demand_per_hour? : Double) -> MaterialCapacityReport
+
 pub fn analyze_production_bottlenecks(@graph.FactoryGraph) -> BottleneckAnalysisReport
 
 pub fn audit_plant_safety_systems(@graph.FactoryGraph) -> SafetyAuditReport
@@ -14,6 +16,8 @@ pub fn audit_plant_safety_systems(@graph.FactoryGraph) -> SafetyAuditReport
 pub fn compute_plant_kpis(@graph.FactoryGraph) -> PlantHealthKPIs
 
 pub fn evaluate_line_redundancy(@graph.FactoryGraph, String, String) -> RedundancyReport
+
+pub fn evaluate_outage_portfolio(@graph.FactoryGraph, Array[String], hourly_downtime_cost? : Double) -> OutagePortfolioReport
 
 pub fn simulate_device_outage(@graph.FactoryGraph, String, hourly_downtime_cost? : Double) -> OutageSimulationResult
 
@@ -28,6 +32,45 @@ pub(all) struct BottleneckAnalysisReport {
   conveyor_bandwidth_bottlenecks : Array[String]
   max_theoretical_hourly_output : Double
   line_balance_efficiency_percent : Double
+} derive(Eq, @debug.Debug)
+
+pub(all) struct EdgeUtilizationSnapshot {
+  edge_id : String
+  source_id : String
+  target_id : String
+  bandwidth_units_per_hour : Double
+  is_active : Bool
+  utilization_percent : Double
+  is_congested : Bool
+} derive(Eq, @debug.Debug)
+
+pub(all) struct MaterialCapacityReport {
+  demand_per_hour : Double
+  constrained_capacity_per_hour : Double
+  output_capacity_per_hour : Double
+  capacity_margin_percent : Double
+  edge_utilization : Array[EdgeUtilizationSnapshot]
+  overloaded_edge_ids : Array[String]
+  constrained_node_ids : Array[String]
+} derive(Eq, @debug.Debug)
+
+pub(all) struct OutagePortfolioReport {
+  valid_scenario_count : Int
+  invalid_node_ids : Array[String]
+  scenarios : Array[OutageScenarioScore]
+  worst_case_node_id : String
+  max_capacity_loss_percent : Double
+  average_capacity_loss_percent : Double
+} derive(Eq, @debug.Debug)
+
+pub(all) struct OutageScenarioScore {
+  failed_node_id : String
+  affected_asset_count : Int
+  affected_workstations_count : Int
+  capacity_loss_percent : Double
+  estimated_hourly_loss_cny : Double
+  resilience_score : Double
+  risk_band : String
 } derive(Eq, @debug.Debug)
 
 pub(all) struct OutageSimulationResult {

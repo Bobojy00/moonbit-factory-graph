@@ -12,7 +12,11 @@ import {
 // Values
 pub fn analyze_bottlenecks(@graph.FactoryGraph) -> @analysis.BottleneckAnalysisReport
 
+pub fn analyze_material_capacity(@graph.FactoryGraph, demand_per_hour? : Double) -> @analysis.MaterialCapacityReport
+
 pub fn diff_topologies(@graph.FactoryGraph, @graph.FactoryGraph) -> @diff.TopologyDiffReport
+
+pub fn evaluate_outage_portfolio(@graph.FactoryGraph, Array[String], hourly_downtime_cost? : Double) -> @analysis.OutagePortfolioReport
 
 pub fn export_dot(@graph.FactoryGraph) -> String
 
@@ -23,6 +27,8 @@ pub fn export_mermaid_diagram(@graph.FactoryGraph) -> String
 pub fn find_shortest_material_path(@graph.FactoryGraph, String, String) -> @algorithms.PathResult?
 
 pub fn generate_audit_report(@graph.FactoryGraph) -> String
+
+pub fn inspect_graph_health(@graph.FactoryGraph) -> @graph.GraphHealthReport
 
 pub fn load_automotive_plant() -> @graph.FactoryGraph
 

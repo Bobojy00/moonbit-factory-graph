@@ -27,4 +27,18 @@ test "root_facade_end_to_end" {
 
   let audit = generate_audit_report(g)
   assert_eq(audit.length() > 100, true)
+
+  let health = inspect_graph_health(g)
+  assert_eq(health.total_node_count, g.node_count())
+  assert_eq(health.total_edge_count, g.edge_count())
+
+  let capacity = analyze_material_capacity(g)
+  assert_eq(capacity.demand_per_hour > 0.0, true)
+  assert_eq(capacity.output_capacity_per_hour > 0.0, true)
+
+  let portfolio = evaluate_outage_portfolio(g, [
+    "SUB-02", "WELD-FLOOR", "UNKNOWN-ASSET",
+  ])
+  assert_eq(portfolio.valid_scenario_count, 2)
+  assert_eq(portfolio.invalid_node_ids, ["UNKNOWN-ASSET"])
 }

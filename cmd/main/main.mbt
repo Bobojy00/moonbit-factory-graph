@@ -24,6 +24,12 @@ fn print_help() -> Unit {
     "  info     <preset>                Display plant summary, assets & power grid",
   )
   println(
+    "  health   <preset>                Inspect topology completeness and flow layers",
+  )
+  println(
+    "  capacity <preset>                Analyze material demand and edge utilization",
+  )
+  println(
     "  analyze  <preset>                Run bottleneck, SPOF and resilience analysis",
   )
   println(
@@ -104,6 +110,87 @@ fn cmd_info(preset_name : String) -> Unit {
         println("    - " + z + ": " + zn.length().to_string() + " nodes")
       }
       println("  Safety Domains   : " + szones.length().to_string())
+    }
+  }
+}
+
+///|
+fn cmd_health(preset_name : String) -> Unit {
+  match get_preset_graph(preset_name) {
+    None => println("Error: Unknown preset '" + preset_name + "'")
+    Some(g) => {
+      let report = @graph.inspect_graph_health(g)
+      println("================ Topology Health ================")
+      println(
+        "Assets: " +
+        report.active_node_count.to_string() +
+        "/" +
+        report.total_node_count.to_string() +
+        " active",
+      )
+      println(
+        "Edges: " +
+        report.active_edge_count.to_string() +
+        "/" +
+        report.total_edge_count.to_string() +
+        " active",
+      )
+      println("Orphan nodes: " + report.orphan_node_ids.length().to_string())
+      for layer in report.layer_health {
+        if layer.active_edge_count > 0 || layer.inactive_edge_count > 0 {
+          println(
+            "  " +
+            layer.flow_type.to_string() +
+            ": " +
+            layer.active_edge_count.to_string() +
+            " active, " +
+            @types.format_double(layer.total_bandwidth_units_per_hour, 1) +
+            " units/h capacity",
+          )
+        }
+      }
+      for node_id in report.orphan_node_ids {
+        println("  Orphan: " + node_id)
+      }
+    }
+  }
+}
+
+///|
+fn cmd_capacity(preset_name : String) -> Unit {
+  match get_preset_graph(preset_name) {
+    None => println("Error: Unknown preset '" + preset_name + "'")
+    Some(g) => {
+      let report = @analysis.analyze_material_capacity(g)
+      println("================ Material Capacity ================")
+      println(
+        "Demand: " +
+        @types.format_double(report.demand_per_hour, 1) +
+        " units/hour",
+      )
+      println(
+        "Output capacity: " +
+        @types.format_double(report.output_capacity_per_hour, 1) +
+        " units/hour",
+      )
+      println(
+        "Capacity margin: " +
+        @types.format_double(report.capacity_margin_percent, 1) +
+        "%",
+      )
+      println(
+        "Overloaded edges: " + report.overloaded_edge_ids.length().to_string(),
+      )
+      for edge_id in report.overloaded_edge_ids {
+        println("  Congested: " + edge_id)
+      }
+      println(
+        "Constrained assets: " +
+        report.constrained_node_ids.length().to_string(),
+      )
+      for node_id in report.constrained_node_ids {
+        println("  Constrained: " + node_id)
+      }
     }
   }
 }
@@ -305,52 +392,96 @@ fn cmd_demo() -> Unit {
 }
 
 ///|
-fn cmd_bench() -> Unit {
-  println("Running Industrial Graph Scaling Benchmark...")
-  let builder = @graph.FactoryGraphBuilder::new(plant_name="BenchmarkPlant")
 
-  // Generate 1000 nodes and 2000 edges
+///|
+fn build_benchmark_graph() -> @graph.FactoryGraph {
+  let builder = @graph.FactoryGraphBuilder::new(
+    plant_name="BenchmarkPlant",
+    takt_time_target_sec=30.0,
+  )
   for i = 1; i <= 1000; i = i + 1 {
-    let nid = "N-" + i.to_string()
     let _ = builder.add_workstation(
-      nid,
+      "N-" + i.to_string(),
       "Machine " + i.to_string(),
       cycle_time_sec=20.0,
       nominal_power_kw=15.0,
     )
   }
+  // A chain plus skip links gives the benchmark both serial and alternate
+  // routing pressure while keeping the topology deterministic.
   for i = 1; i < 1000; i = i + 1 {
-    let src = "N-" + i.to_string()
-    let dst = "N-" + (i + 1).to_string()
-    let _ = builder.connect_material(src, dst, bandwidth=1200.0)
+    let _ = builder.connect_material(
+      "N-" + i.to_string(),
+      "N-" + (i + 1).to_string(),
+      bandwidth=1200.0,
+    )
   }
+  for i = 1; i < 999; i = i + 1 {
+    let _ = builder.connect_material(
+      "N-" + i.to_string(),
+      "N-" + (i + 2).to_string(),
+      bandwidth=900.0,
+      delay=1.0,
+    )
+  }
+  builder.build()
+}
 
-  let g = builder.build()
+///|
+fn cmd_bench() -> Unit {
+  println("Running Industrial Graph Scaling Benchmark...")
+  let graph = build_benchmark_graph()
   println(
     "Benchmark Graph Built: " +
-    g.node_count().to_string() +
+    graph.node_count().to_string() +
     " nodes, " +
-    g.edge_count().to_string() +
-    " edges.",
+    graph.edge_count().to_string() +
+    " material edges.",
   )
 
-  let p = @algorithms.dijkstra_shortest_path(g, "N-1", "N-1000")
-  match p {
-    Some(res) =>
-      println(
-        "Dijkstra 1000-node Path Search Success: " +
-        res.nodes.length().to_string() +
-        " hops traversed.",
+  let bench = @bench.Bench::Bench()
+  bench.bench(
+    name="build_1000_nodes_1997_edges",
+    () => {
+      let candidate = build_benchmark_graph()
+      bench.keep(candidate.node_count() + candidate.edge_count())
+    },
+    count=5,
+  )
+  bench.bench(
+    name="dijkstra_1000_nodes",
+    () => {
+      match @algorithms.dijkstra_shortest_path(graph, "N-1", "N-1000") {
+        Some(result) => bench.keep(result.nodes.length())
+        None => bench.keep(0)
+      }
+    },
+    count=5,
+  )
+  bench.bench(
+    name="spof_biconnectivity_1000_nodes",
+    () => {
+      let report = @algorithms.find_critical_spof_assets(graph)
+      bench.keep(report.single_points_of_failure.length())
+    },
+    count=5,
+  )
+  bench.bench(
+    name="capacity_and_health_report",
+    () => {
+      let capacity = @analysis.analyze_material_capacity(
+        graph,
+        demand_per_hour=120.0,
       )
-    None => println("Dijkstra Path Search Failed.")
-  }
-
-  let spof = @algorithms.find_critical_spof_assets(g)
-  println(
-    "Biconnectivity SPOF Analysis Success: Found " +
-    spof.single_points_of_failure.length().to_string() +
-    " articulation points.",
+      let health = @graph.inspect_graph_health(graph)
+      bench.keep(
+        capacity.overloaded_edge_ids.length() + health.active_edge_count,
+      )
+    },
+    count=5,
   )
+  println("Measured summaries (microseconds per operation):")
+  println(bench.dump_summaries())
   println("Benchmark complete.")
 }
 
@@ -367,6 +498,14 @@ fn main {
     "info" => {
       let preset = if args.length() > 2 { args[2] } else { "automotive" }
       cmd_info(preset)
+    }
+    "health" => {
+      let preset = if args.length() > 2 { args[2] } else { "automotive" }
+      cmd_health(preset)
+    }
+    "capacity" => {
+      let preset = if args.length() > 2 { args[2] } else { "automotive" }
+      cmd_capacity(preset)
     }
     "analyze" => {
       let preset = if args.length() > 2 { args[2] } else { "automotive" }
