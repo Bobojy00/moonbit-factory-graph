@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Count production MoonBit source lines and optionally enforce a floor."""
+"""Count production MoonBit source and optionally enforce quality floors."""
 
 from __future__ import annotations
 
@@ -22,17 +22,37 @@ def production_files(root: Path) -> list[Path]:
     return sorted(files)
 
 
+def source_line_counts(files: list[Path]) -> tuple[int, int]:
+    total = 0
+    code = 0
+    for path in files:
+        for line in path.read_text(encoding="utf-8").splitlines():
+            total += 1
+            stripped = line.strip()
+            if stripped and not stripped.startswith("//"):
+                code += 1
+    return total, code
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--minimum", type=int, default=0)
+    parser.add_argument("--minimum-code-lines", type=int, default=0)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     files = production_files(root)
-    lines = sum(path.read_text(encoding="utf-8").count("\n") for path in files)
+    lines, code_lines = source_line_counts(files)
     print(f"production_files={len(files)}")
     print(f"production_lines={lines}")
+    print(f"production_code_lines={code_lines}")
     if lines < args.minimum:
         print(f"error: production source is below the required floor ({args.minimum})")
+        return 1
+    if code_lines < args.minimum_code_lines:
+        print(
+            "error: production code is below the required floor "
+            f"({args.minimum_code_lines})"
+        )
         return 1
     return 0
 

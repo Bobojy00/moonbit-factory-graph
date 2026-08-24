@@ -11,6 +11,8 @@ pub fn analyze_material_capacity(@graph.FactoryGraph, demand_per_hour? : Double)
 
 pub fn analyze_production_bottlenecks(@graph.FactoryGraph) -> BottleneckAnalysisReport
 
+pub fn audit_operational_readiness(@graph.FactoryGraph, demand_per_hour? : Double) -> OperationalReadinessReport
+
 pub fn audit_plant_safety_systems(@graph.FactoryGraph) -> SafetyAuditReport
 
 pub fn compute_plant_kpis(@graph.FactoryGraph) -> PlantHealthKPIs
@@ -54,6 +56,28 @@ pub(all) struct MaterialCapacityReport {
   constrained_node_ids : Array[String]
 } derive(Eq, @debug.Debug)
 
+pub(all) struct OperationalReadinessReport {
+  readiness_level : ReadinessLevel
+  ready_for_deployment : Bool
+  readiness_score : Double
+  total_validation_issue_count : Int
+  critical_issue_count : Int
+  error_issue_count : Int
+  warning_issue_count : Int
+  orphan_node_ids : Array[String]
+  inactive_node_ids : Array[String]
+  inactive_edge_ids : Array[String]
+  unpowered_asset_ids : Array[String]
+  disconnected_controller_ids : Array[String]
+  congested_edge_ids : Array[String]
+  active_node_ratio_percent : Double
+  active_edge_ratio_percent : Double
+  mean_asset_availability_percent : Double
+  active_flow_layer_count : Int
+  capacity_margin_percent : Double
+  recommendations : Array[String]
+} derive(Eq, @debug.Debug)
+
 pub(all) struct OutagePortfolioReport {
   valid_scenario_count : Int
   invalid_node_ids : Array[String]
@@ -95,6 +119,13 @@ pub(all) struct PlantHealthKPIs {
   max_output_per_hour : Double
   plant_health_score : Double
 } derive(Eq, @debug.Debug)
+
+pub(all) enum ReadinessLevel {
+  Ready
+  Conditional
+  Blocked
+} derive(Compare, Eq, @debug.Debug)
+pub fn ReadinessLevel::to_string(Self) -> String
 
 pub(all) struct RedundancyReport {
   overall_resilience_index : Double

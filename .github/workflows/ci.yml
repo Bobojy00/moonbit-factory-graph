@@ -79,8 +79,8 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Check production MoonBit source size
-        run: python scripts/check_moonbit_source.py --minimum 6000
+      - name: Check production MoonBit source inventory
+        run: python scripts/check_moonbit_source.py --minimum 6000 --minimum-code-lines 6000
 
       - name: Check formatting
         run: moon fmt --check

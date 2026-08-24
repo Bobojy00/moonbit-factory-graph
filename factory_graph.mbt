@@ -116,3 +116,12 @@ pub fn evaluate_outage_portfolio(
     hourly_downtime_cost~,
   )
 }
+
+///|
+/// Audit topology, operating status, capacity, and release readiness.
+pub fn audit_operational_readiness(
+  graph : @graph.FactoryGraph,
+  demand_per_hour? : Double = 0.0,
+) -> @analysis.OperationalReadinessReport {
+  @analysis.audit_operational_readiness(graph, demand_per_hour~)
+}

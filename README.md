@@ -15,7 +15,7 @@ It has no network or database dependency. Inputs are constructed through the typ
 - **Industrial domain model**: workstations, machines, conveyors, buffers, sensors, power sources, PLCs, safety gates, robots, inspection assets, and other manufacturing entities.
 - **Multi-layer topology**: material, control, energy, safety interlock, pneumatic, coolant, and telemetry flows with per-edge bandwidth, latency, medium, protocol, and safety metadata.
 - **Graph algorithms**: multi-criteria Dijkstra, K-shortest paths, disjoint paths, strongly connected components, topological scheduling, centrality, biconnectivity/SPOF, and max-flow.
-- **Operational analysis**: bottleneck and KPI reports, topology health summaries, material capacity utilization, safety audit, redundancy, and batch outage scenarios.
+- **Operational analysis**: bottleneck and KPI reports, topology health summaries, material capacity utilization, safety audit, redundancy, batch outage scenarios, and deployment-readiness audits.
 - **Optimization and change control**: line balancing, failover routing, buffer tuning, energy startup scheduling, topology diffing, and migration risk scoring.
 - **Interoperability**: Graphviz DOT, Mermaid, PlantUML, JSON, CSV, and Markdown audit reports.
 - **Industrial presets**: automotive, lithium battery, semiconductor packaging, and continuous chemical-processing examples.
@@ -66,6 +66,7 @@ let outage = @factory_graph.evaluate_outage_portfolio(
   plant,
   ["WS-SMT", "WS-AOI"],
 )
+let readiness = @factory_graph.audit_operational_readiness(plant)
 ```
 
 The package facade in `factory_graph.mbt` covers the common workflow. Specialized algorithms and reports are also available from their `src/*` packages.
@@ -79,6 +80,7 @@ Run the CLI with `moon run cmd/main -- <command>`:
 | `info <preset>` | Asset, zone, power, and topology summary |
 | `health <preset>` | Inspect topology completeness and active flow layers |
 | `capacity <preset>` | Analyze material demand, capacity margin, and congestion |
+| `readiness <preset>` | Audit deployment readiness and release blockers |
 | `analyze <preset>` | Bottleneck, SPOF, and safety analysis |
 | `outage <preset> <node>` | Simulate a device outage cascade |
 | `path <preset> <from> <to>` | Find a material-flow route |
@@ -99,7 +101,7 @@ Available presets are `automotive`, `battery`, `semiconductor`, and `chemical`.
 ├── src/types/               # Domain enums, metadata, validation values
 ├── src/graph/               # Graph, nodes, edges, builder, health checks
 ├── src/algorithms/          # Routing, flow, connectivity, scheduling
-├── src/analysis/            # KPIs, safety, capacity, outage, resilience
+├── src/analysis/            # KPIs, safety, capacity, outage, resilience, readiness
 ├── src/diff/                # Topology comparison and migration risk
 ├── src/optimizer/           # Balancing, failover, buffers, energy
 ├── src/export/              # DOT, Mermaid, PlantUML, JSON, CSV, reports
@@ -124,7 +126,7 @@ The checked-in result is a reproducibility record, not a hardware-independent pr
 
 ## Testing and quality
 
-The test suite includes package-level unit tests, black-box facade tests, algorithm fixtures, preset construction checks, export checks, and boundary cases for empty graphs, inactive edges, zero capacity, duplicate scenarios, unknown assets, and disconnected topology.
+The test suite includes package-level unit tests, black-box facade tests, algorithm fixtures, preset construction checks, export checks, and boundary cases for empty graphs, inactive edges, zero capacity, duplicate scenarios, unknown assets, disconnected topology, and deployment-readiness findings.
 
 ```bash
 moon fmt --check
@@ -136,7 +138,7 @@ moon info
 python scripts/check_moonbit_source.py --minimum 6000
 ```
 
-`moon info` generates the public `.mbti` interfaces used by CI to detect accidental API drift. The source-size check counts tracked production `.mbt` lines while excluding test files and build/cache directories; it does not count documentation or generated artifacts.
+`moon info` generates the public `.mbti` interfaces used by CI to detect accidental API drift. The source inventory counts repository production `.mbt` files and also checks non-empty, non-comment code lines; test files, documentation, and build/cache directories are excluded.
 
 ## CI
 

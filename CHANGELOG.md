@@ -7,3 +7,8 @@
 - Added deterministic batch outage portfolios with unknown-asset reporting.
 - Replaced the CLI scale demo with measured `core/bench` workloads.
 - Expanded boundary tests and added multi-platform CI coverage checks.
+
+## 0.2.1
+
+- Added deterministic operational-readiness audits combining validation, status, capacity, availability, and deployment recommendations.
+- Added release-gate boundary tests for connected, incomplete, empty, and inactive topologies.

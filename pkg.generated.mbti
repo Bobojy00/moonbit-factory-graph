@@ -14,6 +14,8 @@ pub fn analyze_bottlenecks(@graph.FactoryGraph) -> @analysis.BottleneckAnalysisR
 
 pub fn analyze_material_capacity(@graph.FactoryGraph, demand_per_hour? : Double) -> @analysis.MaterialCapacityReport
 
+pub fn audit_operational_readiness(@graph.FactoryGraph, demand_per_hour? : Double) -> @analysis.OperationalReadinessReport
+
 pub fn diff_topologies(@graph.FactoryGraph, @graph.FactoryGraph) -> @diff.TopologyDiffReport
 
 pub fn evaluate_outage_portfolio(@graph.FactoryGraph, Array[String], hourly_downtime_cost? : Double) -> @analysis.OutagePortfolioReport

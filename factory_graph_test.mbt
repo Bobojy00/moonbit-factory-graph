@@ -41,4 +41,10 @@ test "root_facade_end_to_end" {
   ])
   assert_eq(portfolio.valid_scenario_count, 2)
   assert_eq(portfolio.invalid_node_ids, ["UNKNOWN-ASSET"])
+
+  let readiness = audit_operational_readiness(g)
+  assert_eq(readiness.ready_for_deployment, true)
+  assert_eq(readiness.critical_issue_count, 0)
+  assert_eq(readiness.error_issue_count, 0)
+  assert_true(readiness.mean_asset_availability_percent > 99.0)
 }

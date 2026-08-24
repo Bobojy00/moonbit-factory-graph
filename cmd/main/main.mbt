@@ -30,6 +30,9 @@ fn print_help() -> Unit {
     "  capacity <preset>                Analyze material demand and edge utilization",
   )
   println(
+    "  readiness <preset>               Audit deployment readiness and release blockers",
+  )
+  println(
     "  analyze  <preset>                Run bottleneck, SPOF and resilience analysis",
   )
   println(
@@ -190,6 +193,57 @@ fn cmd_capacity(preset_name : String) -> Unit {
       )
       for node_id in report.constrained_node_ids {
         println("  Constrained: " + node_id)
+      }
+    }
+  }
+}
+
+///|
+fn cmd_readiness(preset_name : String) -> Unit {
+  match get_preset_graph(preset_name) {
+    None => println("Error: Unknown preset '" + preset_name + "'")
+    Some(g) => {
+      let report = @analysis.audit_operational_readiness(g)
+      println("================ Operational Readiness ================")
+      println("Level: " + report.readiness_level.to_string())
+      println(
+        "Ready for deployment: " + report.ready_for_deployment.to_string(),
+      )
+      println(
+        "Readiness score: " +
+        @types.format_double(report.readiness_score, 1) +
+        " / 100",
+      )
+      println(
+        "Validation issues: " +
+        report.total_validation_issue_count.to_string() +
+        " (" +
+        report.critical_issue_count.to_string() +
+        " critical, " +
+        report.error_issue_count.to_string() +
+        " error, " +
+        report.warning_issue_count.to_string() +
+        " warning)",
+      )
+      println(
+        "Active topology: " +
+        @types.format_double(report.active_node_ratio_percent, 1) +
+        "% nodes, " +
+        @types.format_double(report.active_edge_ratio_percent, 1) +
+        "% edges",
+      )
+      println(
+        "Mean asset availability: " +
+        @types.format_double(report.mean_asset_availability_percent, 2) +
+        "%",
+      )
+      println(
+        "Capacity margin: " +
+        @types.format_double(report.capacity_margin_percent, 1) +
+        "%",
+      )
+      for recommendation in report.recommendations {
+        println("  - " + recommendation)
       }
     }
   }
@@ -506,6 +560,10 @@ fn main {
     "capacity" => {
       let preset = if args.length() > 2 { args[2] } else { "automotive" }
       cmd_capacity(preset)
+    }
+    "readiness" => {
+      let preset = if args.length() > 2 { args[2] } else { "automotive" }
+      cmd_readiness(preset)
     }
     "analyze" => {
       let preset = if args.length() > 2 { args[2] } else { "automotive" }

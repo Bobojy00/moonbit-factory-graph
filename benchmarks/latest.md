@@ -12,9 +12,9 @@ The benchmark reports microseconds per operation. The raw summaries below were p
 
 | Workload | Mean (µs) | Median (µs) | Min (µs) | Max (µs) | Batch size |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Build 1,000 nodes / 1,997 edges | 8,058.328 | 7,959.991 | 7,729.349 | 8,564.507 | 11 |
-| Dijkstra, 1,000 nodes | 24,747.347 | 24,523.725 | 23,958.155 | 26,344.830 | 4 |
-| Biconnectivity/SPOF, 1,000 nodes | 1,733.062 | 1,732.844 | 1,707.451 | 1,759.045 | 55 |
-| Capacity + health report | 1,308.253 | 1,333.842 | 1,221.035 | 1,367.329 | 81 |
+| Build 1,000 nodes / 1,997 edges | 25,389.297 | 25,620.425 | 21,121.345 | 29,501.565 | 4 |
+| Dijkstra, 1,000 nodes | 54,653.130 | 56,936.150 | 45,058.520 | 61,209.130 | 2 |
+| Biconnectivity/SPOF, 1,000 nodes | 3,202.853 | 3,276.421 | 2,680.278 | 3,858.149 | 29 |
+| Capacity + health report | 2,032.844 | 2,052.052 | 1,850.744 | 2,153.593 | 52 |
 
 The repository CI requires a stable compiler of at least `moonc 0.10.9`; the record above is a local native run and is not presented as a CI result.
